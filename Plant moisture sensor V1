@@ -1,0 +1,82 @@
+# RaspBerry PI Pico W plant moisture sensor with MQTT
+import network, utime, machine, time, ubinascii, random
+from umqtt.simple import MQTTClient
+from machine import ADC, Pin
+
+
+# Definition of constants
+# WiFi credentials
+SSID = "<enter your wifi SSID>"
+SSID_PASSWORD = "<Enter your wifi password>"
+
+# MQTT specifics
+MQTTBROKER="broker.emqx.io"
+ClientID = f'raspberry-pub-{time.time_ns()}'
+user = "emqx"
+password = "public"
+topic = "raspberry/mqtt"
+msg = b'{"msg":"hello"}' #it is preceded by b. This indicates that the strings are to be converted into bytes.
+
+#Moisture measurement specifics
+readDelay = 0.5 # delay between readings
+# use variables instead of numbers:
+soil = ADC(Pin(26)) # Soil moisture PIN reference
+
+#Calibraton values
+min_value=11000 # 41770 was my measure in dry / outside the pot measurement
+max_value=42000 # 10882 was measure in water
+
+
+
+# WiFi connect
+def do_connect():
+    sta_if = network.WLAN(network.STA_IF)
+    if not sta_if.isconnected():
+        print('connecting to network...')
+        sta_if.active(True)
+        sta_if.connect(SSID, SSID_PASSWORD)
+        while not sta_if.isconnected():
+            print("Attempting to connect....")
+            utime.sleep(1)
+    print('Connected! Network config:', sta_if.ifconfig())
+    
+print("Connecting to your wifi...")
+do_connect()
+
+# MQTT Broker connect
+def connect():
+    print('Connected to MQTT Broker "%s"' % (MQTTBROKER))
+    client = MQTTClient(ClientID, MQTTBROKER, 1883, user, password)
+    client.connect()
+    return client
+
+def reconnect():
+    print('Failed to connect to MQTT broker, Reconnecting...' % (MQTTBROKER))
+    time.sleep(5)
+    client.reconnect()
+
+
+try:
+    client = connect()
+except OSError as e:
+    reconnect()
+
+
+
+#Measure Moisture and publish results
+while True: # read moisture value and convert to percentage into the calibration range
+    measure = soil.read_u16()
+    measure_adjusted=measure
+    if measure > max_value:
+        measure_adjusted=max_value
+    if measure < min_value:
+        measure_adjusted=min_value
+    moisture = 100-((measure_adjusted-min_value)*100/(max_value-min_value))
+    integer=int(moisture)
+    temp=str(integer).encode()
+    client.publish(topic, temp, qos=0) #publish measurement to MQTT broker & topic
+    # print values
+    print("moisture: " + "%.0f" % moisture +"% (adc: "+str(measure_adjusted)+")")
+    utime.sleep(readDelay) # set a delay between readings`
+
+
