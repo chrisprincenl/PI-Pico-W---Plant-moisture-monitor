@@ -1,0 +1,64 @@
+# pub.py
+import network, utime, machine
+import time
+import ubinascii
+from umqtt.simple import MQTTClient
+import random
+
+#
+# Note - this example makes use of the free MQTTX broker (someone else account)
+# For the client i've used the MQTT explorer app on an Apple macbook
+#
+
+# Definition of constants - WiFi credentials and MQTT specifics
+SSID = "<replace with your WIFI SSID>"
+SSID_PASSWORD = "<replace with your password>
+
+server="broker.emqx.io"
+ClientID = f'raspberry-pub-{time.time_ns()}'
+user = "emqx"
+password = "public"
+topic = "raspberry/mqtt"
+msg = b'{"msg":"hello"}'
+
+
+# WiFi connection
+def do_connect():
+    sta_if = network.WLAN(network.STA_IF)
+    if not sta_if.isconnected():
+        print('connecting to network...')
+        sta_if.active(True)
+        sta_if.connect(SSID, SSID_PASSWORD)
+        while not sta_if.isconnected():
+            print("Attempting to connect....")
+            utime.sleep(1)
+    print('Connected! Network config:', sta_if.ifconfig())
+    
+print("Connecting to your wifi...")
+do_connect()
+
+
+
+# MQTT Broker connection
+def connect():
+    print('Connected to MQTT Broker "%s"' % (server))
+    client = MQTTClient(ClientID, server, 1883, user, password)
+    client.connect()
+    return client
+
+def reconnect():
+    print('Failed to connect to MQTT broker, Reconnecting...' % (server))
+    time.sleep(5)
+    client.reconnect()
+
+
+try:
+    client = connect()
+except OSError as e:
+    reconnect()
+
+while True:
+  print('send message %s on topic %s' % (msg, topic))
+  client.publish(topic, msg, qos=0)
+  time.sleep(1)
+
