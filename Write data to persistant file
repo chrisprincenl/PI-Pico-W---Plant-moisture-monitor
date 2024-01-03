@@ -1,0 +1,44 @@
+# RaspBerry PI Pico W plant moisture sensor with MQTT
+import network, utime, machine, time, ubinascii, random
+from umqtt.simple import MQTTClient
+from machine import ADC, Pin
+import ujson as json
+
+
+#Calibraton values
+min_value=11000 # 41770 was my measure in dry / outside the pot measurement
+max_value=42000 # 10882 was measure in water
+
+jsonData = {"ADC0_min": min_value, "ADC0_max": max_value} # Initialize a JSON literal
+
+
+#open JSON file and load calibration values
+
+try:
+    with open('ADC0values.json', 'r') as f:
+        data = json.load(f)
+        max_value= data["ADC0_max"]
+        min_value= data["ADC0_min"]
+        print("Read from file. Max value =", max_value, " Min_value=", min_value)
+except: #the file does not exist
+    print("No sensor connected to ADC0 (file ADC0values.json does not exist).")
+    
+
+# Save calibration values JSON file
+def save_calibration_values(max, min):
+    jsonData["ADC0_max"]=max
+    jsonData["ADC0_min"]=min
+    try:
+        with open('ADC0values.json', 'w') as f:
+            json.dump(jsonData, f)
+    except:
+        print("Could not save the calibration data.")
+
+# Calibraton values
+min_value=20000 # test
+max_value=30000 # interim as test
+
+save_calibration_values(max_value, min_value)
+print("After the write to file. Max value =", max_value, " Min_value=", min_value)
+    
+    
