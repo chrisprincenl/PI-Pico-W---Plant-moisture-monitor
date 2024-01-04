@@ -1,0 +1,34 @@
+# RaspBerry PI Pico W plant moisture sensor read and calibrate 
+#
+# This example program reads the sensor from ADC0 (pin 26) to determine the capacitive value.
+# It then determines the moisture percentage, based on the calibration values
+#
+
+# import required modules
+from machine import ADC, Pin, I2C
+import utime
+ 
+# use variables instead of numbers:
+soil = ADC(Pin(26)) # Soil moisture PIN reference
+ 
+#Calibraton values
+min_value=11000 # 41770 was my measure in dry / outside the pot measurement
+max_value=42000 # 10882 was measure in water
+ 
+readDelay = 0.5 # delay between readings
+
+while True:
+    # read moisture value and convert to percentage into the calibration range
+    measure = soil.read_u16()
+    measure_adjusted=measure
+    if measure > max_value:
+        measure_adjusted=max_value
+    if measure < min_value:
+        measure_adjusted=min_value
+    
+    moisture = 100-((measure_adjusted-min_value)*100/(max_value-min_value))
+    
+    # print values
+    print("moisture: " + "%.0f" % moisture +"% (adc: "+str(measure_adjusted)+")")
+    
+    utime.sleep(readDelay) # set a delay between readings
