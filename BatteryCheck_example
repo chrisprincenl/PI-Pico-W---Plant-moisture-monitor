@@ -1,0 +1,41 @@
+# BatteryCheck_example
+#
+# Note for Pico W - The wireless interface is connected via SPI to the RP2040 microcontroller.
+# Due to pin limitations, some of the wireless interface pins are shared. The CLK is shared with VSYS monitor,
+# so only when there isn’t an SPI transaction in progress can VSYS be read via the ADC. 
+# Workaround described here: https://forums.raspberrypi.com/viewtopic.php?t=336775
+# Warning: There is a risk of bricking your Pico W when setting GPIO25 low (or input) when
+# the Wireless chip is in use. Hence in this exampe programme it is excluded.
+#
+from machine import Pin, ADC
+import time
+
+#On the Pico W, vbus sense is on one of the special internal function pins, not GP24
+USBpowered = Pin('WL_GPIO2', Pin.IN)
+
+led = Pin("LED", Pin.OUT)
+vsys = ADC(29) 
+conversion_factor = 3 * 3.3 / 65535
+
+full_battery = 4.2                  # these are our reference voltages for a full/empty battery, in volts
+empty_battery = 2.8                 # the values could vary by battery size/manufacturer so you might need to adjust them
+
+led.off()
+time.sleep(2)
+
+
+if USBpowered.value() == 1: 
+        # Not powered by a battery, so switch on the led
+        led.on()
+        print("Powered by USB ")
+else:
+        # Powered by a battery
+        led.off()
+        voltage = vsys.read_u16() * conversion_factor
+        percentage = 100 * ((voltage - empty_battery) / (full_battery - empty_battery))
+        if percentage > 100:
+            percentage = 100.00
+        
+print("In this example programme the VSYS readings are not reliable as explained in the comments.")
+print("The programme only detects whether it is battery powered or USB powered.")
+  
