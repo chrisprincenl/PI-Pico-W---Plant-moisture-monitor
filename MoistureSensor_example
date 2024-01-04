@@ -1,5 +1,7 @@
 # RaspBerry PI Pico W plant moisture sensor read and calibrate 
 #
+# Filename: MoistureSensor_example
+#
 # This example program reads the sensor from ADC0 (pin 26) to determine the capacitive value.
 # It then determines the moisture percentage, based on the calibration values
 #
