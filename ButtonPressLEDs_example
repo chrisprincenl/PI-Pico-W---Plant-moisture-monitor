@@ -1,0 +1,60 @@
+# ButtonPressLEDs example programme
+# This program waits for a button press (value becomes zero) ising an interrupt. When the button
+# is pressed, the external (red/green multi color) LED will togglev to the other color.
+# Note that as the button is directly connected to the board, it will have mechanical bouncing,
+# hence in the code it will include debouncing code to overcome that. 
+#  
+# We first import the Pin class and initialize a global variable called interrupt_flag to 0.
+# We will use this variable to keep track of the occurrence of interrupts.
+# Global variables in MicroPython can be accessed by all functions.
+# Then we create a pin object of the Pin class. GPIO 22 is set as an input with PULL_UP enabled.
+from machine import Pin
+import time
+
+DEBOUNCE = 300    # 300 ms is what usually is used for button debouncing.
+GPIO_BUTTON1 = 22 # Button1 is connected to GP22 port
+GPIO_LEDRED = 1   # The Red led is connected to GP1 port
+GPIO_LEDGREEN = 2 # The Green led is connected to GP2 port
+
+interrupt_flag=0
+debounce_time=0
+Button1 = Pin(GPIO_BUTTON1,Pin.IN,Pin.PULL_UP)
+ledred = Pin(GPIO_LEDRED, Pin.OUT)     #configure GPIO-1 Pin as an output pin and create and led object for Pin class
+ledgreen = Pin(GPIO_LEDGREEN, Pin.OUT) #configure GPIO-2 Pin as an output pin and create and led object for Pin class
+
+# Next, we define a function called callback() to handle interrupts. The code inside
+# this function should not perform any complex task, as it needs to hand over CPU usage
+# to the main program quickly. We set the interrupt_flag variable as 1. Note that we need
+# to use the global keyword when we change a global variable inside a function.
+def Button1_IsPressed(Button1):
+    global interrupt_flag, debounce_time, DEBOUNCE
+    if (time.ticks_ms()-debounce_time) > DEBOUNCE:
+        interrupt_flag= 1
+        debounce_time=time.ticks_ms()
+    
+# To attach the interrupt to the pin, we use irq() function. This function takes two arguments :
+# trigger : trigger can be of the following types-
+# (1) Pin.IRQ_FALLING– interrupt on falling edge.
+# (2) Pin.IRQ_RISING– interrupt on rising edge.
+# (3) Pin.IRQ_LOW_LEVEL – interrupt on LOW level.(Not supported in MicroPython for Pico at the time of publishing this article.)
+# (4) Pin.IRQ_HIGH_LEVEL - interrupt on HIGH level.(Not supported in MicroPython for Pico at the time of publishing this article.)
+# (5) Pin.IRQ_FALLING | Pin.IRQ_RISING – interrupt on both the rising edge and the falling edge.
+#
+# handler : handler specifies the function which will be called when an interrupt occurs.
+#
+Button1.irq(trigger=Pin.IRQ_FALLING, handler=Button1_IsPressed)
+
+#
+# In the while loop, we continuously check the value of the interrupt_flag variable.
+# If this value is detected as ‘1’, that means an interrupt has occurred.
+# We reset the variable to ‘0’ so that the variable can be set again when an interrupt occurs.
+#
+ledred.value(True)
+ledgreen.value(False)
+while True:
+    if interrupt_flag is 1:
+        interrupt_flag=0
+        print("Interrupt Detected, the value of the button is: ", Button1.value())
+        ledred.toggle()
+        ledgreen.toggle()
+
