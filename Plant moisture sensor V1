@@ -1,82 +1,271 @@
-# RaspBerry PI Pico W plant moisture sensor with MQTT
-import network, utime, machine, time, ubinascii, random
+import json, os, network, utime, machine
+from machine import ADC, Pin, I2C, RTC
+import ubinascii
 from umqtt.simple import MQTTClient
-from machine import ADC, Pin
+import utime as time
+import usocket as socket
+import ustruct as struct
+
+# Create a list with measurements. A measurement is defined as a dictionary
+# 
+#
+measurements = [] 
+
+measurement = {"HW_Version": "00",        # What is the version of the hardware during this measurement 
+               "SW_Version": "00",        # What is the version of the hardware during this measurement
+               "Date_Time":  "10:1011",         # What is the date when this measurement was taken
+               "Temp":      10,           # What is the temperature in Celcius during this measurement
+               "MoistPerc": 100,    # What is the moisturising percentage of this measurement
+               "Problem":   1}         # What is the result of the measurement is the plant ok? 
+
+verbose = False #True  # If it is True during the programme all messages are being printed (for trouble shooting)
+
+# Errors_And_Warnings - this function module handles the errors and warnings (l=level and m=message)
+def Errors_And_Warnings(l, m):
+    global verbose
+        
+    if verbose == True:
+        if l >= 8: # Error
+            print("Error:", m)
+        elif 4 >= l >= 7:
+            print("Warning:", m)
+        else:
+            print("Info:", m)
+
+    led = machine.Pin("LED", machine.Pin.OUT)
+    if l >= 8: # Error - keep flashing the internal led
+        while True:
+            led.on()
+            time.sleep(0.5)
+            led.off()
 
 
-# Definition of constants
-# WiFi credentials
-SSID = "<enter your wifi SSID>"
-SSID_PASSWORD = "<Enter your wifi password>"
 
-# MQTT specifics
-MQTTBROKER="broker.emqx.io"
-ClientID = f'raspberry-pub-{time.time_ns()}'
-user = "emqx"
-password = "public"
-topic = "raspberry/mqtt"
-msg = b'{"msg":"hello"}' #it is preceded by b. This indicates that the strings are to be converted into bytes.
+# Connect_to_WiFi
+def Connect_to_WiFi():
+    #Replace the following with your WIFI Credentials
+    SSID = "fill in your SSID"
+    SSID_PASSWORD = "fill in your password"
 
-#Moisture measurement specifics
-readDelay = 0.5 # delay between readings
-# use variables instead of numbers:
-soil = ADC(Pin(26)) # Soil moisture PIN reference
-
-#Calibraton values
-min_value=11000 # 41770 was my measure in dry / outside the pot measurement
-max_value=42000 # 10882 was measure in water
-
-
-
-# WiFi connect
-def do_connect():
     sta_if = network.WLAN(network.STA_IF)
     if not sta_if.isconnected():
-        print('connecting to network...')
+        Errors_And_Warnings(0, "connecting to WiFi network...") 
         sta_if.active(True)
         sta_if.connect(SSID, SSID_PASSWORD)
         while not sta_if.isconnected():
-            print("Attempting to connect....")
+            Errors_And_Warnings(4, "Attempting to connect to WiFi....") 
             utime.sleep(1)
-    print('Connected! Network config:', sta_if.ifconfig())
+    Errors_And_Warnings(0, "Connected! Network config:" + str(sta_if.ifconfig())) 
+
+
+# RTC - Synchronise the internal Pi Pico W clock (RTC) with the NTP server
+# Each time the PI is powered off, the datetime RTC goes back to its default. This function module
+# connects over WiFi to an NTP server and syncs.
+# For the purpose of measurements, the real date and time are to be included for each measurement.
+# Note that all time is GMT - so no daylight savings corrections to allow for easy calculations/sequencing.
+def RTC_Get_Time():
+    NTP_DELTA = 2208988800
+    NTP_QUERY = bytearray(48)
+    NTP_QUERY[0] = 0x1B
+    # NTP-Host
+    NTP_HOST = 'pool.ntp.org'
     
-print("Connecting to your wifi...")
-do_connect()
+    addr = socket.getaddrinfo(NTP_HOST, 123)[0][-1]
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        s.settimeout(1)
+        res = s.sendto(NTP_QUERY, addr)
+        msg = s.recv(48)
+    finally:
+        s.close()
+    ntp_time = struct.unpack("!I", msg[40:44])[0]
+    
+    tm=time.gmtime(ntp_time - NTP_DELTA)
+    rtc.datetime((tm[0], tm[1], tm[2], tm[6] + 1, tm[3], tm[4], tm[5], 0))
 
-# MQTT Broker connect
-def connect():
-    print('Connected to MQTT Broker "%s"' % (MQTTBROKER))
-    client = MQTTClient(ClientID, MQTTBROKER, 1883, user, password)
-    client.connect()
-    return client
-
-def reconnect():
-    print('Failed to connect to MQTT broker, Reconnecting...' % (MQTTBROKER))
-    time.sleep(5)
-    client.reconnect()
+    return time.gmtime(ntp_time - NTP_DELTA)
+    
+    
+# set the RealTimeClock - RTC
+# First get the time (call function RTC_Get_Time() ) from NTP server
+def RTC_Set_Time():
+    tm = RTC_Get_Time()
+    rtc.datetime((tm[0], tm[1], tm[2], tm[6] + 1, tm[3], tm[4], tm[5], 0))
 
 
-try:
-    client = connect()
-except OSError as e:
-    reconnect()
+def Calibrate():
+    Errors_And_Warnings(0, "Calibrate (Dummy)")
+
+# Write all measurements to the file.
+# If there are more than MAXLOGSIZE, the oldest measurement is deleted
+# Input:  filename and measurements
+# Return: 0 all is ok. 1 means the file did not exist and was created 
+def File_Write_Measurements(file, m):
+    error=False
+    
+    #Keep the list to a max size to prevent the file to become too large 
+    MAXLOGSIZE=25000 # this is roughly 2 weeks of measurements being stored in the file
+    Errors_And_Warnings(0, "The number of records in the list is: " + str(len(m)) + " Maximum number of records are: " + str(MAXLOGSIZE))
+    while len(m) > MAXLOGSIZE :
+        del m[0]
+        Errors_And_Warnings(0, "Deleted the oldest record, now there are only " + str(len(m)) + " records left")
+
+    try:
+        with open(file, 'w') as f:
+            for item in m:
+                # write each item on a new line
+                f.write("%s\n" % item)
+    except: #the file does not exist
+        Errors_And_Warnings(8, "File_Write_Measurements() - Error opening file.")
+        error=True
+    return error
 
 
+# Read all measurements from (JSON Coded) file and store it in a list.
+# Input:  filename
+# Return: a list with all measurements 
+def File_Read_Measurements(file):
+    measurements = []
 
-#Measure Moisture and publish results
-while True: # read moisture value and convert to percentage into the calibration range
+    try:
+        with open(file, 'r') as f:
+            for record in f:
+                # remove linebreak from a current name
+                # linebreak is the last character of each line
+                x = record[:-1]
+                measurements.append(x)
+    except: #the file does not exist
+        Errors_And_Warnings(8, "File_Read_Measurements() - file does not exist.")
+    return measurements
+
+
+#
+# Do a measurement - moisturising soil sensor measure
+#
+# Note: Currently this is a dummy value
+# Input:  max and min calibration values 
+# Output: measurement 
+def Measure(max, min):
+    HW_VERSION=00    # This is the hardware version when the measurement was taken. For compatibility purposes
+    SW_VERSION=00    # This is the software version when the measurement was taken. For compatibility purposes
+    # use variables instead of numbers:
+    soil = ADC(Pin(26)) # Soil moisture PIN reference
+
+    measurement = {"HW_Version": HW_VERSION,  # What is the version of the hardware during this measurement 
+               "SW_Version": SW_VERSION,      # What is the version of the hardware during this measurement
+               "Date_Time":  "10:1011",         # What is the date when this measurement was taken
+               "Temp":      10,           # What is the temperature in Celcius during this measurement
+               "MoistPerc": 100,    # What is the moisturising percentage of this measurement
+               "Problem":   1}         # What is the result of the measurement is the plant ok?
+    
+    # read moisture value and convert to percentage into the calibration range
     measure = soil.read_u16()
     measure_adjusted=measure
-    if measure > max_value:
-        measure_adjusted=max_value
-    if measure < min_value:
-        measure_adjusted=min_value
-    moisture = 100-((measure_adjusted-min_value)*100/(max_value-min_value))
-    integer=int(moisture)
-    temp=str(integer).encode()
-    client.publish(topic, temp, qos=0) #publish measurement to MQTT broker & topic
-    # print values
-    print("moisture: " + "%.0f" % moisture +"% (adc: "+str(measure_adjusted)+")")
-    utime.sleep(readDelay) # set a delay between readings`
+    if measure > max:
+        measure_adjusted=max
+    if measure < min:
+        measure_adjusted=min
+    
+    moisture = round(100-((measure_adjusted-min)*100/(max-min)))
+    measurement["MoistPerc"] = moisture
+#    print("Measurement:", measure, "Adjusted measurement", measure_adjusted, "max=", max, "min", min, "Perc", moisture)
+    
+
+    # Get the date/time stamp for this measurement from the Pi Pico RTC
+    measurement["Date_Time"] = rtc.datetime()
+
+    # Set the temparature to None as there isnt a temparature sensor connected to the Pico 
+    measurement["Temp"] = None
+    
+    return measurement
+
+#
+# This function analyses from all measurements (all) whether the plant soil is too dry or too wet
+# Currently the logic is limited and requires more analysis and coding
+# if moisture level of the latest measurement (m) is between 30% and 60%.  
+# Input: measurements list (all) and the measure (m) that will be analysed against other records in the list
+# Return: problem value (True or False)
+def Measure_analyse(all, m):
+    problemvalue=False
+    #  percentage=(all[-1])["MoistPerc"] # Take the last record in the list and in that record identify the MoistPerc
+    percentage = m["MoistPerc"]
+    if percentage < 10 or percentage > 40:
+        problemvalue = True
+    return problemvalue
+
+
+def MQTT_Send_Measurement(m):
+    server="broker.emqx.io"
+    ClientID = f'raspberry-pub-{time.time_ns()}'
+    user = "emqx"
+    password = "public"
+    topic = "Plant Moisture Monitor 1"
+    msg=json.dumps(m) #Convert the Python dictionary object into a JSON string
+
+    # MQTT Broker connection
+    # print('Connected to MQTT Broker "%s"' % (server))
+    client = MQTTClient(ClientID, server, 1883, user, password)
+    
+    try:
+        client.connect()
+    except OSError as e:
+        Errors_And_Warnings(4, "Failed to connect to MQTT broker, Reconnecting (on more time)... ")
+        time.sleep(5)
+        # Try one more time
+        client.reconnect()
+   
+    result = client.publish(topic, msg, qos=0)
+    Errors_And_Warnings(0, "MQTT Message sent: " + msg + " Result:" + str(result))
+    time.sleep(1)
+    client.disconnect()
+    
+###################################################################################################################    
+# Main programme    (Note the calibration is currently hardcoded)                                                 #
+###################################################################################################################
+internal_led = machine.Pin("LED", machine.Pin.OUT)
+rtc = RTC()
+x = []
+
+# Connect to WiFi
+error=Connect_to_WiFi()
+if error==True:
+    Errors_And_Warnings(8, "Connection to WiFi Error")
+
+# Synchonise the internal Pi Pico W clock with NPT server
+RTC_Set_Time()
+Errors_And_Warnings(0, "The date/time is:" + str(rtc.datetime()))
+
+
+while True:
+    Errors_And_Warnings(0, "Read measurements from file, take a measure, analyse, send to MQTT broker and save file.")
+    internal_led.on() # whilst taking a measure and sending it through, switch the internal led on
+    x.clear()
+    
+    # Read the measurements from file into a list
+    x=File_Read_Measurements("Measurements.txt")
+    Errors_And_Warnings(0, "All measurements have been read from file and stored into a list. Total records: " + str(len(x)))
+    
+    # Do a measurement from the sensor 
+    min_value=11000 # Calibraton min_value was 10882 when measured in water 
+    max_value=42000 # Calibraton max_value was 41770 when measured in dry / outside the plant pot
+    m = Measure(max_value, min_value)
+
+    # Analyse whether the soil of the plant requires watering
+    result = Measure_analyse(x, m)
+    m["Problem"] = result # Update the problem field in the measurement record
+    Errors_And_Warnings(0, "After the measurement analysis, the result: " + str(result) + " Percentage: " + str(m["MoistPerc"]) + " DateTime: " + str(m["Date_Time"]))
+
+    # Publish the latest measurement as an MQTT message 
+    MQTT_Send_Measurement(m)
+
+    # Append this measurement record to the list and then write the whole list to file 
+    x.append(m)
+    File_Write_Measurements("Measurements.txt", x)
+    
+    internal_led.off()
+    time.sleep(60) # Delay for 1 minute (60 seconds)
+
+# End of the programme
+
 
 
