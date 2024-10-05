@@ -29,15 +29,15 @@ This project exposes the following area's of technology learnings:
 
 ## Key functionality
 
-*) Calibrate the sensor - a button is added to the sensor and also a multi colour LED. When the button is pressed, the calibration starts and the sensor then will take the maximum and minimum measures for the duration the button is pressed, and will use that as 0% and 100%. During this calibration, the sensor needs to be put into a grass of water and be outside of the soil fully dry. If the delta is large enough, the LED will be green, if the measurement doesn't show enough difference in value's the sensor isn't activated and the led will remain red.
+* Calibrate the sensor - a button is added to the sensor and also a multi colour LED. When the button is pressed, the calibration starts and the sensor then will take the maximum and minimum measures for the duration the button is pressed, and will use that as 0% and 100%. During this calibration, the sensor needs to be put into a grass of water and be outside of the soil fully dry. If the delta is large enough, the LED will be green, if the measurement doesn't show enough difference in value's the sensor isn't activated and the led will remain red.
 Multiple moisture sensors (max 3) can be connected and once connected, they only get activated after a successful calibration.
-*) Manual measure - a button is added to the Pi Pico enclosure to start the Pico and will do an additional ad-hoc measure. A multi color led is added to each sensor which flashes green when it starts and turns green when wifi is connected. If there is a problem with wifi or with the connection to the MQTT broker, it will turn red.
-*) Resent measures and their dates&times. So keep measurements for a month. https://electrocredible.com/rpi-pico-save-data-permanently-flash-micropython/
-*) Select alert levels per plant (this is the 'knowledge'. formula's and will require pot size, type of earth, type of plant, size of the plant, temperature, light levels etc)
-*) Analyse: (1) Given too much water (can be determined from historical usage and type of plant) (2) Plant is in need of watering (3) Date/time water was given (when the moisture level goes up, it means it was watered).
-*) versions - each message will include a software version and a hardware version. This is for future use in case the product evolves, and can make the device backwards compatible.
-*) Use homebridge - access plat information on homekit
-*) plantfood - a button and day counter when plantfood was provided
+* Manual measure - a button is added to the Pi Pico enclosure to start the Pico and will do an additional ad-hoc measure. A multi color led is added to each sensor which flashes green when it starts and turns green when wifi is connected. If there is a problem with wifi or with the connection to the MQTT broker, it will turn red.
+* Resent measures and their dates&times. So keep measurements for a month. https://electrocredible.com/rpi-pico-save-data-permanently-flash-micropython/
+* Select alert levels per plant (this is the 'knowledge'. formula's and will require pot size, type of earth, type of plant, size of the plant, temperature, light levels etc)
+* Analyse: (1) Given too much water (can be determined from historical usage and type of plant) (2) Plant is in need of watering (3) Date/time water was given (when the moisture level goes up, it means it was watered).
+* versions - each message will include a software version and a hardware version. This is for future use in case the product evolves, and can make the device backwards compatible.
+* Use homebridge - access plat information on homekit
+* plantfood - a button and day counter when plantfood was provided
 
 ## Messages
 
