@@ -1,13 +1,13 @@
 # PI-Pico-W---Plant-moisture-monitor
 PI Pico W using MQTT and a capacitative Soil Moisture sensor to daily check on a plants need for watering 
 
-Introduction
+#Introduction
 
 This project monitors the moisture levels of the soil a (house) plant using a PI Pico W, a Capacitive Soil Moisture Sensor and MQTT.
 
 Important - this is not a completed project - all being developed currently
 
-Background
+#Background
 
 This project exposes the following area's of learnings:
 
@@ -22,9 +22,9 @@ This project exposes the following area's of learnings:
 ![Pi Pico W - wiring.png](PI%20Pico%20W%20-%20wiring.png)
 
 
-Functionality
+#Functionality
 
-The key functionality is:
+##The key functionality is:
 
 *) Calibrate the sensor - a button is added to the sensor and also a multi colour LED. When the button is pressed, the calibration starts and the sensor then will take the maximum and minimum measures for the duration the button is pressed, and will use that as 0% and 100%. During this calibration, the sensor needs to be put into a grass of water and be outside of the soil fully dry. If the delta is large enough, the LED will be green, if the measurement doesn't show enough difference in value's the sensor isn't activated and the led will remain red.
 Multiple moisture sensors (max 3) can be connected and once connected, they only get activated after a successful calibration.
@@ -36,7 +36,7 @@ Multiple moisture sensors (max 3) can be connected and once connected, they only
 *) Use homebridge - access plat information on homekit
 *) plantfood - a button and day counter when plantfood was provided
 
-Messages
+##Messages
 
 The messages that will be sent are:
 
