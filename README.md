@@ -155,11 +155,34 @@ To enable plant/soil moisture levels and determining whether the plant needs wat
 
 See the StoreMeasurements_example programme
 
-Plant information
+# Software
+## Micropython
+why using micropyton? Limitations is single processor usage.
+
+## OOP - Objects
+Python is an object oriented programming language. As part of this project the developments are mostly OOP developed. Below is an overview of all key objects used in the project;
+(need picture)
+
+### Plant object 
+### Wifi object
+### Mqtt object
+### Onoff object
+To switch a Pico pin on or off. Very useful when an LED is connected to an I/O pin or an optocoupler or relais.
+on creation of the object, the pin number is mandatory argument.
+* on() - switches it on
+* off() - switch the pin off
+* ison() - Returns TRUE if the pin is on
+### Pump object
+On creation two arguments: pin for pump and another optional for the waterflow sensor.
+* water() - water flow. Agument is amount in ml
+* pumpon()
+* pumpoff()
+
+# Plant information
 
 This section explains the watering requirements for each plant and the logic for the sensor to determine whether it needs water or not (yet).
 
-Philodendron monstera
+## Philodendron monstera
 
 During the summer months the Philodendron monstera requires watering when the soil starts to dry out. During the winter the the soil needs to be a week dry before the plant requires watering. Roughly in summer once in the 3 weeks, and in winter once in the 6 weeks. Info: Logic, determine whether summer or winter, then determine last time it was watered. if the soil is more than a week dry, it needs watering.
 
