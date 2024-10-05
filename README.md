@@ -11,13 +11,13 @@ Background
 
 This project exposes the following area's of learnings:
 
-*) Hardware - Raspberry Pi Pico W which has WiFi to enable sending regular measurements. Use its build-in temperature measure sensor. And how to store data (measurements) as persistent data such that it is kept when the power is disconnected for a short while. The way to minimise power usage, an Adafruit TPL5110 Low Power Timer Breakout is used. Note: in case it is not battery operated, the timer breakout will not be required.
-*) Capacitive soil Sensor to sense the level of moist in the plant pot
-*) Thonny IDE (Interactive Development Environment) on my laptop to deploy the software onto the PI Pico
-*) MicroPython language and libraries
-*) MQTT messaging (PubSub - Publish the measurements onto a public - free - hub such that I can subscribe to it with my laptop, a phone app or a homekit device using homebridge)
-*) JSON(Javascript Object Notation) - instead of defining own format, use existing JSON format for MQTT messaging.
-*) Homebridge - Subscribe to MQTT Hub to read sensor data and view status on Apple HOME 
+* Hardware - Raspberry Pi Pico W which has WiFi to enable sending regular measurements. Use its build-in temperature measure sensor. And how to store data (measurements) as persistent data such that it is kept when the power is disconnected for a short while. The way to minimise power usage, an Adafruit TPL5110 Low Power Timer Breakout is used. Note: in case it is not battery operated, the timer breakout will not be required.
+* Capacitive soil Sensor to sense the level of moist in the plant pot
+* Thonny IDE (Interactive Development Environment) on my laptop to deploy the software onto the PI Pico
+* MicroPython language and libraries
+* MQTT messaging (PubSub - Publish the measurements onto a public - free - hub such that I can subscribe to it with my laptop, a phone app or a homekit device using homebridge)
+* JSON(Javascript Object Notation) - instead of defining own format, use existing JSON format for MQTT messaging.
+* Homebridge - Subscribe to MQTT Hub to read sensor data and view status on Apple HOME 
 
 ![Pi Pico W - wiring.png](PI%20Pico%20W%20-%20wiring.png)
 
