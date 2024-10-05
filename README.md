@@ -19,6 +19,9 @@ This project exposes the following area's of learnings:
 *) JSON(Javascript Object Notation) - instead of defining own format, use existing JSON format for MQTT messaging.
 *) Homebridge - Subscribe to MQTT Hub to read sensor data and view status on Apple HOME 
 
+![Alt text](Pi Pico W - wiring.png)
+
+
 Functionality
 
 The key functionality is:
