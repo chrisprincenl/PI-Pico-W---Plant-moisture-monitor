@@ -9,7 +9,7 @@ Important - this is not a completed project - all being developed currently
 
 # Background
 
-This project exposes the following area's of learnings:
+This project exposes the following area's of technology learnings:
 
 * Hardware - Raspberry Pi Pico W which has WiFi to enable sending regular measurements. Use its build-in temperature measure sensor. And how to store data (measurements) as persistent data such that it is kept when the power is disconnected for a short while. The way to minimise power usage, an Adafruit TPL5110 Low Power Timer Breakout is used. Note: in case it is not battery operated, the timer breakout will not be required.
 * Capacitive soil Sensor to sense the level of moist in the plant pot
