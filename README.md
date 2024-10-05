@@ -24,7 +24,7 @@ This project exposes the following area's of learnings:
 
 # Functionality
 
-## The key functionality is:
+## Key functionality
 
 *) Calibrate the sensor - a button is added to the sensor and also a multi colour LED. When the button is pressed, the calibration starts and the sensor then will take the maximum and minimum measures for the duration the button is pressed, and will use that as 0% and 100%. During this calibration, the sensor needs to be put into a grass of water and be outside of the soil fully dry. If the delta is large enough, the LED will be green, if the measurement doesn't show enough difference in value's the sensor isn't activated and the led will remain red.
 Multiple moisture sensors (max 3) can be connected and once connected, they only get activated after a successful calibration.
@@ -36,7 +36,7 @@ Multiple moisture sensors (max 3) can be connected and once connected, they only
 *) Use homebridge - access plat information on homekit
 *) plantfood - a button and day counter when plantfood was provided
 
-##Messages
+## Messages
 
 The messages that will be sent are:
 
@@ -72,7 +72,7 @@ Schottky diode battery connection
 
 As mentioned in the Pico datasheet section 4.6 it is possible to connect both usb power and battery power, but you need to add an schottky diode inbetween battery and VSYS.
 
-Tools
+# Tools
 
 Thonny IDE
 https://thonny.org
@@ -83,11 +83,11 @@ iPhone IOS App
 IoT MQTT Panel
 Setup and Install
 
-1) Preparations
+1 Preparations
 
 Install Thonny on your laptop and use a usb cable to connect to the Raspberry Pi Pico W. Make sure the cable is a data cable as there are many cables around that are only used for powering / charging battery packs which do not have the data wires in its usb cable. For this project the Raspberry PI Pico W is programmed with the MicroPython language
 
-2) Wiring
+2 Wiring
 
 See the picture in the wiring section.
 
@@ -96,7 +96,7 @@ Connect the Pico to the laptop and start Thonny
 Connect a two color led with resistors
 Connect a button
 (optional) Connect a three 1.5v battery pack with a Schottky diode
-3) Coding
+3 Coding
 
 1) First test the sensor and calibrate
 
@@ -163,34 +163,34 @@ Philodendron monstera
 
 During the summer months the Philodendron monstera requires watering when the soil starts to dry out. During the winter the the soil needs to be a week dry before the plant requires watering. Roughly in summer once in the 3 weeks, and in winter once in the 6 weeks. Info: Logic, determine whether summer or winter, then determine last time it was watered. if the soil is more than a week dry, it needs watering.
 
-Trouble shooting
+# Trouble shooting
 
-umqtt.simple install fails - Whilst installing in Thonny IDE the simple MQTT package it had an error. The reason was that the Thonny application on the laptop was an old version. Upgrading Thonny to the latest version fixed the problem.
-Measuring battery level VSYS not working when network module is imported - As described in VSYS there is a problem using ADC(3) / GPIO29 to read VSYS on the Pico W and still have WiFi working. The resolution is to check VSYS before importing the network library. The pin definitions must be reset when the library loads. This works ok. ps Also see USBcharging Pico W
-Internal LED does not switch on or off - The pins wiring to the Pi Pico W are different than the standard Pi Pico. Hence different code is required. Search for led=machine.Pin("LED", machine.Pin.OUT), led.on() and led.off().
-MQTT JSON message could not be parsed on iPhone app IoT MQTT Panel - Two problems, first the message that was sent was a dictionary object and needed to be converted to a JSON string. The function for this is json.dumps(). The second problem was the parsing the JSON message in the app. Finally using in JsonPath for subscribe the following string: $.MoistPerc it worked and the app recognised the value.
-Determining Battery level - UNRESOLVED - Currently not worked out how to code the battery level. Coding whether the PI Pico is powered by usb or battery is possible, but unclear how to then code the battery level. Any suggestions?
-Pi pico error - a full reset to factory resolved the problem. https://electrocredible.com/how-to-reset-raspberry-pi-pico-w/
-References
+* umqtt.simple install fails - Whilst installing in Thonny IDE the simple MQTT package it had an error. The reason was that the Thonny application on the laptop was an old version. Upgrading Thonny to the latest version fixed the problem.
+* Measuring battery level VSYS not working when network module is imported - As described in VSYS there is a problem using ADC(3) / GPIO29 to read VSYS on the Pico W and still have WiFi working. The resolution is to check VSYS before importing the network library. The pin definitions must be reset when the library loads. This works ok. ps Also see USBcharging Pico W
+* Internal LED does not switch on or off - The pins wiring to the Pi Pico W are different than the standard Pi Pico. Hence different code is required. Search for led=machine.Pin("LED", machine.Pin.OUT), led.on() and led.off().
+* MQTT JSON message could not be parsed on iPhone app IoT MQTT Panel - Two problems, first the message that was sent was a dictionary object and needed to be converted to a JSON string. The function for this is json.dumps(). The second problem was the parsing the JSON message in the app. Finally using in JsonPath for subscribe the following string: $.MoistPerc it worked and the app recognised the value.
+* Determining Battery level - UNRESOLVED - Currently not worked out how to code the battery level. Coding whether the PI Pico is powered by usb or battery is possible, but unclear how to then code the battery level. Any suggestions?
+* Pi pico error - a full reset to factory resolved the problem. https://electrocredible.com/how-to-reset-raspberry-pi-pico-w/
+# References
 
-Sensor - https://how2electronics.com/capacitive-soil-moisture-sensor-with-raspberry-pi-pico/#
-Sensor - other example - https://how2electronics.com/iot-soil-moisture-monitor-with-raspberry-pi-pico-w-blynk/
-MQTT - https://www.tomshardware.com/how-to/send-and-receive-data-raspberry-pi-pico-w-mqtt
-UMQTT simple - https://randomnerdtutorials.com/micropython-mqtt-esp32-esp8266/
-Examples MQTT Connect - https://github.com/emqx/MQTT-Client-Examples/tree/master/mqtt-client-Micropython
-Homebridge - https://www.instructables.com/Magic-MQTT-Button-for-HomeKit-Homebridge/#step1
-Homebridge - https://github.com/arachnetech/homebridge-mqttthing/blob/master/docs/Configuration.md
-video homebridge example - https://youtu.be/xlB1Js3Wmus?si=ouxNLGfudgIYg8w-
-Save data permanently on PI Pico - https://electrocredible.com/rpi-pico-save-data-permanently-flash-micropython/
-Raspberry Pi Pico W Temperature Data Logger - https://electrocredible.com/raspberry-pi-pico-w-data-logger-temperature-micropython/#google_vignette
-Plants and watering them - https://www.123planten.nl/verzorging/water-geven
-Battery check - https://github.com/TuriSc/RP2040-Battery-Check/tree/main
-RaspBerry PI Pico data sheet - https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf
-Button and LED connections - https://projects.raspberrypi.org/en/projects/introduction-to-the-pico/8
-ISR for button press - https://electrocredible.com/raspberry-pi-pico-external-interrupts-button-micropython/
-Pumps - https://thepihut.com/products/peristaltic-liquid-pump-with-silicone-tubing-5v-to-6v-dc-power
-RTC - https://github.com/LutzEmbeddedTec/Pico_w_RTC
-URL Encode - https://www.w3schools.com/tags/ref_urlencode.asp
+* Sensor - https://how2electronics.com/capacitive-soil-moisture-sensor-with-raspberry-pi-pico/#
+* Sensor - other example - https://how2electronics.com/iot-soil-moisture-monitor-with-raspberry-pi-pico-w-blynk/
+* MQTT - https://www.tomshardware.com/how-to/send-and-receive-data-raspberry-pi-pico-w-mqtt
+* UMQTT simple - https://randomnerdtutorials.com/micropython-mqtt-esp32-esp8266/
+* Examples MQTT Connect - https://github.com/emqx/MQTT-Client-Examples/tree/master/mqtt-client-Micropython
+* Homebridge - https://www.instructables.com/Magic-MQTT-Button-for-HomeKit-Homebridge/#step1
+* Homebridge - https://github.com/arachnetech/homebridge-mqttthing/blob/master/docs/Configuration.md
+* video homebridge example - https://youtu.be/xlB1Js3Wmus?si=ouxNLGfudgIYg8w-
+* Save data permanently on PI Pico - https://electrocredible.com/rpi-pico-save-data-permanently-flash-micropython/
+* Raspberry Pi Pico W Temperature Data Logger - https://electrocredible.com/raspberry-pi-pico-w-data-logger-temperature-micropython/#google_vignette
+* Plants and watering them - https://www.123planten.nl/verzorging/water-geven
+* Battery check - https://github.com/TuriSc/RP2040-Battery-Check/tree/main
+* RaspBerry PI Pico data sheet - https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf
+* Button and LED connections - https://projects.raspberrypi.org/en/projects/introduction-to-the-pico/8
+* ISR for button press - https://electrocredible.com/raspberry-pi-pico-external-interrupts-button-micropython/
+* Pumps - https://thepihut.com/products/peristaltic-liquid-pump-with-silicone-tubing-5v-to-6v-dc-power
+* RTC - https://github.com/LutzEmbeddedTec/Pico_w_RTC
+* URL Encode - https://www.w3schools.com/tags/ref_urlencode.asp
 
 
 
