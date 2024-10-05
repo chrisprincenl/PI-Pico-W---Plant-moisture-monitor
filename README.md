@@ -191,8 +191,4 @@ During the summer months the Philodendron monstera requires watering when the so
 * Pumps - https://thepihut.com/products/peristaltic-liquid-pump-with-silicone-tubing-5v-to-6v-dc-power
 * RTC - https://github.com/LutzEmbeddedTec/Pico_w_RTC
 * URL Encode - https://www.w3schools.com/tags/ref_urlencode.asp
-
-
-
-References:
-1) https://how2electronics.com/capacitive-soil-moisture-sensor-with-raspberry-pi-pico/#
+* https://how2electronics.com/capacitive-soil-moisture-sensor-with-raspberry-pi-pico/#
