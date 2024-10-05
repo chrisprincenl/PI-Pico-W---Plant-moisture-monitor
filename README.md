@@ -47,13 +47,13 @@ All messages have (1) date (2) time (3) which source/sensor it comes from
 Battery low
 Plant moisture level (0 - dry 1 - Low 2 - Medium 3 - High) or percentage?
 Message - date/time/temp/percentage moisture/Problem. Example: 20240118/13:20/+06/100/0 In this example, the measurement was taken on 18 Jan 2024 at 20 min past 1 in the afternoon. The temperature was +6 degrees Celsius and moisture level was 100 percent. The sensor concludes a 0, which means all ok. (4 is warning, 5 battery low, 8 is dry, 9 is too wet for too long).
-Hardware & Wiring
+# Hardware & Wiring
 
-Raspberry Pi Pico W
+## Raspberry Pi Pico W
 
-Raspberry-Pi-Pico-W-Pinout_1
+## Raspberry-Pi-Pico-W-Pinout_1
 
-Capacitive Soil Moisture Sensor
+## Capacitive Soil Moisture Sensor
 
 The soil moisture sensor (https://www.dfrobot.com/product-1385.html) measures soil mositure levels by capacitive sensing rather than resistive sensing like other sensors on the market. It is made of corrosion resistant material which gives it an excellent service life. Insert it in to the soil around the plant. This module includes an on-board voltage regulator which gives it an operating voltage range of 3.3 ~ 5.5V. It is perfect for low-voltage MCUs, both 3.3V and 5V. For compatibility with a Raspberry Pi it will need the PI Pico ADC converter.
 
@@ -63,7 +63,7 @@ To be experimented- when you create a sillicone cast, you can fill the top with 
 
 image
 
-Power breaker
+## Power breaker
 
 Adafruit
 
@@ -71,7 +71,7 @@ Wiring
 
 IMG_1072
 
-Schottky diode battery connection
+## Schottky diode battery connection
 
 As mentioned in the Pico datasheet section 4.6 it is possible to connect both usb power and battery power, but you need to add an schottky diode inbetween battery and VSYS.
 
