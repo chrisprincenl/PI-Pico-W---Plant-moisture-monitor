@@ -15,6 +15,7 @@ This project exposes the following area's of learnings:
 * Capacitive soil Sensor to sense the level of moist in the plant pot
 * Thonny IDE (Interactive Development Environment) on my laptop to deploy the software onto the PI Pico
 * MicroPython language and libraries
+* Object Oriented Programming
 * MQTT messaging (PubSub - Publish the measurements onto a public - free - hub such that I can subscribe to it with my laptop, a phone app or a homekit device using homebridge)
 * JSON(Javascript Object Notation) - instead of defining own format, use existing JSON format for MQTT messaging.
 * Homebridge - Subscribe to MQTT Hub to read sensor data and view status on Apple HOME 
