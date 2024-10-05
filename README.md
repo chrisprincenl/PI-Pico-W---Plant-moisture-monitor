@@ -18,6 +18,7 @@ This project exposes the following area's of learnings:
 * Object Oriented Programming
 * MQTT messaging (PubSub - Publish the measurements onto a public - free - hub such that I can subscribe to it with my laptop, a phone app or a homekit device using homebridge)
 * JSON(Javascript Object Notation) - instead of defining own format, use existing JSON format for MQTT messaging.
+* Telegram messaging
 * Homebridge - Subscribe to MQTT Hub to read sensor data and view status on Apple HOME 
 
 ![Pi Pico W - wiring.png](PI%20Pico%20W%20-%20wiring.png)
