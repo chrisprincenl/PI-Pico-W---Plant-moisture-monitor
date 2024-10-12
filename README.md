@@ -162,13 +162,17 @@ See the StoreMeasurements_example programme
 ## Micropython
 why using micropyton? Limitations is single processor usage.
 
-## OOP - Objects
+## OOP - classes
 Python is an object oriented programming language. As part of this project the developments are mostly OOP developed. For example, there can be three plants being monitored, plant is an object that will be created three times. But where there is only one purpose and no inheritance needed, just a function module is created. For instance reading and writing a serrings file. Below is an overview of all key objects used in the project;
 (need picture)
 
-### Plant object 
-### Wifi object
-### Mqtt object
+### Plant class 
+### Wifi class
+### Mqtt class
+### Date class
+### Time class
+### DateCal class
+### PicoDHT22 class
 ### Onoff object
 To switch a Pico pin on or off. Very useful when an LED is connected to an I/O pin or an optocoupler or relais.
 on creation of the object, the pin number is mandatory argument.
