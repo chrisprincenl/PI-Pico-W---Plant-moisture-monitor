@@ -168,6 +168,11 @@ Python is an object oriented programming (OOP) language. As part of this project
 * Use a function module: When you have a single instance, and you only need to perform some operations or computations. You can focus on writing reusable, stateless functions.
 * Use a class (object): When you need to manage multiple instances of something (e.g., multiple sensors) where each one needs to maintain its own state and have its own set of behaviors (methods). This makes your code modular, reusable, and easier to manage as you scale.
 
+Function Modules:
+* telegram()
+* Onoff()
+* 
+
 Below is an overview of all key classes used in the project;
 (need picture)
 
