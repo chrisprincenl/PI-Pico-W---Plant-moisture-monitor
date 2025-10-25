@@ -22,7 +22,7 @@ This project exposes the following area's of technology learnings:
 * Telegram messaging
 * Homebridge - Subscribe to MQTT Hub to read sensor data and view status on Apple HOME 
 
-![Pi Pico W - wiring.png](PI%20Pico%20W%20-%20wiring.png)
+<img width="561" height="478" alt="PI Pico W - plant moisture" src="https://github.com/user-attachments/assets/a83fecb2-b6c3-40d0-8b92-901e2c98a95d" />
 
 
 # Functionality
